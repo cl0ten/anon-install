@@ -4,6 +4,8 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
+BLUE='\033[0;34m'
+BLUE_ANON='\033[38;2;2;128;175m'
 NOCOLOR='\033[0m'
 
 # load release info
@@ -39,7 +41,7 @@ echo -e "${CYAN}==================================================${NOCOLOR}"
 sudo cp /etc/anon/anonrc /etc/anon/anonrc.bak
 
 # print ascii
-echo -e "${BLUE}"
+echo -e "${BLUE_ANON}"
 cat << "EOF"
 
                                                                  /$$
