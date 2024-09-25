@@ -93,11 +93,9 @@ done
 # bandwidthrate
 echo -e "${NOCOLOR}"
 echo -e "${CYAN}3/4 Enter BandwidthRate and BandwidthBurst in Mbit ${NOCOLOR}"
-echo -e "${BLUE_ANON}Hint: Set the BandwidthBurst 20% lower than the BandwidthRate ${NOCOLOR}"
-read -p "3/4 BandwidthRate (leave empty to skip): " BANDWIDTH_RATE
+echo -e "${BLUE_ANON}Hint: BandwidthBurst must be at least equal to BandwidthRate ${NOCOLOR}"
 
-#echo -e "${NOCOLOR}"
-#echo -e "${CYAN}3/4 Enter BandwidthBurst in Mbit ${NOCOLOR}"
+read -p "3/4 BandwidthRate (leave empty to skip): " BANDWIDTH_RATE
 read -p "3/4 BandwidthBurst (leave empty to skip): " BANDWIDTH_BURST
 
 # ORport
