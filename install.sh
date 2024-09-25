@@ -1,101 +1,174 @@
 #!/bin/bash
 
+# colors
 RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
 NOCOLOR='\033[0m'
 
+# load release info
 . /etc/os-release
 
+# check sudo
 if ! command -v sudo &>/dev/null; then
-    echo "Error: sudo command not found. Please make sure that you run the installation command with sudo bin/bash .."
+    echo -e "${RED}Error: sudo command not found. Please make sure that you run the installation command with sudo bin/bash ..${NOCOLOR}"
     exit 1
 fi
 
+
+# install anon package
+echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${CYAN}          Starting ANON Installation              ${NOCOLOR}"
+echo -e "${CYAN}==================================================${NOCOLOR}"
+
 sudo wget -qO- https://deb.en.anyone.tech/anon.asc | sudo tee /etc/apt/trusted.gpg.d/anon.asc
-
 sudo echo "deb [signed-by=/etc/apt/trusted.gpg.d/anon.asc] https://deb.en.anyone.tech anon-live-$VERSION_CODENAME main" | sudo tee /etc/apt/sources.list.d/anon.list
-
 sudo apt-get update --yes
-
 sudo apt-get install anon --yes
 
 if [ $? -ne 0 ]; then
-    echo -e "${RED}\nFailed to install the Anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.\n${NOCOLOR}"
+    echo -e "${RED}Failed to install the anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.${NOCOLOR}"
     exit 1
 fi
 
-sudo mv /etc/anon/anonrc /etc/anon/anonrc.bak
+echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${CYAN}          Installation Complete                   ${NOCOLOR}"
+echo -e "${CYAN}==================================================${NOCOLOR}"
 
-read -p "Enter your desired nickname for the Anon Relay (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
+
+sudo cp /etc/anon/anonrc /etc/anon/anonrc.bak
+
+# print ascii
+echo -e "${BLUE}"
+cat << "EOF"
+
+                                                                 /$$
+                                                                |__/
+  /$$$$$$  /$$$$$$$  /$$   /$$  /$$$$$$  /$$$$$$$   /$$$$$$      /$$  /$$$$$$
+ |____  $$| $$__  $$| $$  | $$ /$$__  $$| $$__  $$ /$$__  $$    | $$ /$$__  $$
+  /$$$$$$$| $$  \ $$| $$  | $$| $$  \ $$| $$  \ $$| $$$$$$$$    | $$| $$  \ $$
+ /$$__  $$| $$  | $$| $$  | $$| $$  | $$| $$  | $$| $$_____/    | $$| $$  | $$
+|  $$$$$$$| $$  | $$|  $$$$$$$|  $$$$$$/| $$  | $$|  $$$$$$$ /$$| $$|  $$$$$$/
+ \_______/|__/  |__/ \____  $$ \______/ |__/  |__/ \_______/|__/|__/ \______/
+                     /$$  | $$
+                    |  $$$$$$/
+                     \______/
+
+EOF
+echo -e "${NOCOLOR}"
+
+# start config
+echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${CYAN}       Start Relay Configuration Wizard           ${NOCOLOR}"
+echo -e "${CYAN}==================================================${NOCOLOR}"
+
+
+# nickname
+echo -e "${NOCOLOR}"
+echo -e "Enter the desired nickname for your Anon Relay"
+read -p "(1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 while ! [[ "$NICKNAME" =~ ^[a-zA-Z0-9]{1,19}$ ]]; do
-    echo "Error: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces."
-    read -p "Enter your desired nickname for the Anon Relay (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
+    echo -e "${RED}Error: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces.${NOCOLOR}"
+    read -p "Enter the desired nickname for your Anon Relay (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 done
 
+# contactinfo
+echo -e "${NOCOLOR}"
 read -p "Enter your contact information for the Anon Relay: " CONTACT_INFO
 
-read -p "Do you want to link your Ethereum wallet address now? (yes/no): " HAS_ETH_WALLET
-if [[ "$HAS_ETH_WALLET" =~ ^[Yy][Ee][Ss]$ ]]; then
-    while true; do
-        read -p "Enter your Ethereum wallet address: " ETH_WALLET
-        if [[ "$ETH_WALLET" =~ ^0x[a-fA-F0-9]{40}$ ]]; then
-            CONTACT_INFO="$CONTACT_INFO @anon: $ETH_WALLET"
-            break
-        else
-            echo "Error: Invalid Ethereum wallet address format. Must start with '0x' followed by 40 hexadecimal characters."
-        fi
-    done
-fi
-
-read -p "Enter comma-separated fingerprints for your relay's family (leave empty to skip): " MY_FAMILY
-
+# myfamily
+echo -e "${NOCOLOR}"
+echo "Enter a comma-separated list of fingerprints for your relay's family "
+read -p "(leave empty to skip): " MY_FAMILY
 while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-Z0-9]+,)*[A-Z0-9]+$ ]]; do
-    echo "Error: Invalid MyFamily format. Please enter comma-separated fingerprints with only capital letters."
-    read -p "Enter comma-separated fingerprints for your relay's family (leave empty to skip): " MY_FAMILY
+    echo -e "${RED}Error: Invalid MyFamily format. Please enter comma-separated fingerprints with only capital letters.${NOCOLOR}"
+    read -p "Enter a comma-separated list of fingerprints for your relay's family (leave empty to skip): " MY_FAMILY
 done
 
-read -p "Enter BandwidthRate in Mbit (leave empty to skip): " BANDWIDTH_RATE
-read -p "Enter BandwidthBurst in Mbit (leave empty to skip): " BANDWIDTH_BURST
+# bandwidthrate
+echo -e "${NOCOLOR}"
+echo "Enter BandwidthRate in Mbit "
+read -p "(leave empty to skip): " BANDWIDTH_RATE
+echo -e "${NOCOLOR}"
+echo "Enter BandwidthBurst in Mbit "
+read -p "(leave empty to skip): " BANDWIDTH_BURST
+
+# ORport
+while true; do
+    echo -e "${NOCOLOR}"
+    echo "Enter ORPort"
+    read -rp "[Default: 9001]: " OR_PORT
+    OR_PORT="${OR_PORT:-9001}"
+    if [[ $OR_PORT =~ ^[0-9]+$ ]]; then
+        break
+    else
+        echo -e "${RED}Error: Invalid ORPort format. Must contain only numbers.${NOCOLOR}" >&2
+    fi
+done
+
+# EVM address
+echo -e "${NOCOLOR}"
+echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${CYAN}     Ethereum Wallet Configuration (Optional)     ${NOCOLOR}"
+echo -e "${CYAN}==================================================${NOCOLOR}"
 
 while true; do
-        read -rp "Enter ORPOrt [Default: 9001]: " OR_PORT
-        OR_PORT="${OR_PORT:-9001}"  # Set a default value if no input is provided
-        if [[ $OR_PORT =~ ^[0-9]+$ ]]; then
-                break  # Break out of the loop if input consists only of numbers
-        else
-                echo "Error: Invalid ORPort format. Must contain only numbers." >&2
-        fi
+    echo -e "${NOCOLOR}"
+    echo "Do you want to enter your Ethereum address for contribution rewards before finishing the configuration?"
+    read -p "(yes/no): " HAS_ETH_WALLET
+    case "$HAS_ETH_WALLET" in
+        [Yy][Ee][Ss])
+            while true; do
+                read -p "Enter your Ethereum wallet address: " ETH_WALLET
+                if [[ "$ETH_WALLET" =~ ^0x[a-fA-F0-9]{40}$ ]]; then
+                    CONTACT_INFO="$CONTACT_INFO @anon: $ETH_WALLET"
+                    break
+                else
+                    echo -e "${RED}Error: Invalid Ethereum wallet address format. Must start with '0x' followed by 40 hexadecimal characters.${NOCOLOR}"
+                fi
+            done
+            break
+            ;;
+        [Nn][Oo])
+            break
+            ;;
+        *)
+            echo -e "${RED}Error: Please respond with 'yes' or 'no'.${NOCOLOR}"
+            ;;
+    esac
 done
 
-read -p "If your Anon Relay does not use IPv6, you can disable it. Do you want to disable IPv6? (yes/no): " DISABLE_IPV6
-while ! [[ "$DISABLE_IPV6" =~ ^(yes|no)$ ]]; do
-    echo "Error: Invalid choice. Please enter 'yes' or 'no'."
-    read -p "If your Anon Relay does not use IPv6, you can disable it. Do you want to disable IPv6? (yes/no): " DISABLE_IPV6
-done
-
-# Writing the configuration file
-
+# write configuration to anonrc
+sudo rm -f /etc/anon/anonrc
 
 cat <<EOF | sudo tee /etc/anon/anonrc >/dev/null
+Nickname $NICKNAME
+ContactInfo $CONTACT_INFO
 Log notice file /var/log/anon/notices.log
-ORPort $OR_PORT $( [[ "$DISABLE_IPV6" == "yes" ]] && echo "IPv4Only")
-$( [[ "$DISABLE_IPV6" == "yes" ]] && echo "AddressDisableIPv6")
+ORPort $OR_PORT
 ControlPort 9051
 SocksPort 0
 ExitRelay 0
 IPv6Exit 0
 ExitPolicy reject *:*
 ExitPolicy reject6 *:*
-
 $( [[ -n "$BANDWIDTH_RATE" ]] && echo "BandwidthRate $BANDWIDTH_RATE Mbit" )
 $( [[ -n "$BANDWIDTH_BURST" ]] && echo "BandwidthBurst $BANDWIDTH_BURST Mbit" )
-Nickname $NICKNAME
-ContactInfo $CONTACT_INFO
 EOF
 
 if [[ -n "$MY_FAMILY" ]]; then
     echo "MyFamily $MY_FAMILY" | sudo tee -a /etc/anon/anonrc >/dev/null
 fi
 
+# restart the service
 sudo systemctl restart anon.service
 
-echo "Anon installation completed successfully."
+# show config
+echo -e "${GREEN}==================================================${NOCOLOR}"
+echo -e "${GREEN}              Configuration Summary               ${NOCOLOR}"
+echo -e "${GREEN}==================================================${NOCOLOR}"
+cat /etc/anon/anonrc
+echo -e "${NOCOLOR}"
+echo -e "${GREEN}==================================================${NOCOLOR}"
+echo -e "${GREEN}   Anon configuration completed successfully.     ${NOCOLOR}"
+echo -e "${GREEN}==================================================${NOCOLOR}"
