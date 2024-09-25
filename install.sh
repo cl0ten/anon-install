@@ -4,7 +4,7 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-BLUE='\033[0;34m'
+#BLUE='\033[0;34m'
 BLUE_ANON='\033[38;2;2;128;175m'
 NOCOLOR='\033[0m'
 
@@ -19,23 +19,24 @@ fi
 
 
 # install anon package
-echo -e "${CYAN}==================================================${NOCOLOR}"
-echo -e "${CYAN}          Starting ANON Installation              ${NOCOLOR}"
-echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+echo -e "${CYAN}           Starting ANON Installation                  ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 sudo wget -qO- https://deb.en.anyone.tech/anon.asc | sudo tee /etc/apt/trusted.gpg.d/anon.asc
 sudo echo "deb [signed-by=/etc/apt/trusted.gpg.d/anon.asc] https://deb.en.anyone.tech anon-live-$VERSION_CODENAME main" | sudo tee /etc/apt/sources.list.d/anon.list
 sudo apt-get update --yes
-sudo apt-get install anon --yes
+sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes anon
+
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Failed to install the anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.${NOCOLOR}"
     exit 1
 fi
 
-echo -e "${CYAN}==================================================${NOCOLOR}"
-echo -e "${CYAN}          Installation Complete                   ${NOCOLOR}"
-echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+echo -e "${GREEN}           ANON Installation Complete                 ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 
 sudo cp /etc/anon/anonrc /etc/anon/anonrc.bak
@@ -60,63 +61,67 @@ EOF
 echo -e "${NOCOLOR}"
 
 # start config
-echo -e "${CYAN}==================================================${NOCOLOR}"
-echo -e "${CYAN}       Start Relay Configuration Wizard           ${NOCOLOR}"
-echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+echo -e "${CYAN}        Start Relay Configuration Wizard               ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 
 # nickname
 echo -e "${NOCOLOR}"
-echo -e "Enter the desired nickname for your Anon Relay"
-read -p "(1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
+echo -e "${CYAN}1/4 Enter the desired Nickname and Contact information for your Anon Relay${NOCOLOR}"
+read -p "1/4 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 while ! [[ "$NICKNAME" =~ ^[a-zA-Z0-9]{1,19}$ ]]; do
-    echo -e "${RED}Error: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces.${NOCOLOR}"
-    read -p "Enter the desired nickname for your Anon Relay (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
+    echo -e "${RED}1/4 Error: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces.${NOCOLOR}"
+    echo -e "${CYAN}1/4 Enter the desired Nickname and Contact information for your Anon Relay${NOCOLOR}"
+	read -p "1/4 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 done
 
 # contactinfo
-echo -e "${NOCOLOR}"
-read -p "Enter your contact information for the Anon Relay: " CONTACT_INFO
+read -p "1/4 Contact Information (leave empty to skip): " CONTACT_INFO
+
 
 # myfamily
 echo -e "${NOCOLOR}"
-echo "Enter a comma-separated list of fingerprints for your relay's family "
-read -p "(leave empty to skip): " MY_FAMILY
+echo -e "${CYAN}2/4 Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
+read -p "2/4 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-Z0-9]+,)*[A-Z0-9]+$ ]]; do
-    echo -e "${RED}Error: Invalid MyFamily format. Please enter comma-separated fingerprints with only capital letters.${NOCOLOR}"
-    read -p "Enter a comma-separated list of fingerprints for your relay's family (leave empty to skip): " MY_FAMILY
+    echo -e "${RED}2/4 Error: Invalid MyFamily format. Please enter comma-separated fingerprints with only capital letters.${NOCOLOR}"
+    echo -e "${CYAN}2/4 Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
+	read -p "2/4 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 done
 
 # bandwidthrate
 echo -e "${NOCOLOR}"
-echo "Enter BandwidthRate in Mbit "
-read -p "(leave empty to skip): " BANDWIDTH_RATE
-echo -e "${NOCOLOR}"
-echo "Enter BandwidthBurst in Mbit "
-read -p "(leave empty to skip): " BANDWIDTH_BURST
+echo -e "${CYAN}3/4 Enter BandwidthRate and BandwidthBurst in Mbit ${NOCOLOR}"
+echo -e "${BLUE_ANON}Hint: Set the BandwidthBurst 20% lower than the BandwidthRate ${NOCOLOR}"
+read -p "3/4 BandwidthRate (leave empty to skip): " BANDWIDTH_RATE
+
+#echo -e "${NOCOLOR}"
+#echo -e "${CYAN}3/4 Enter BandwidthBurst in Mbit ${NOCOLOR}"
+read -p "3/4 BandwidthBurst (leave empty to skip): " BANDWIDTH_BURST
 
 # ORport
 while true; do
     echo -e "${NOCOLOR}"
-    echo "Enter ORPort"
+    echo -e "${CYAN}4/4 Enter ORPort${NOCOLOR}"
     read -rp "[Default: 9001]: " OR_PORT
     OR_PORT="${OR_PORT:-9001}"
     if [[ $OR_PORT =~ ^[0-9]+$ ]]; then
         break
     else
-        echo -e "${RED}Error: Invalid ORPort format. Must contain only numbers.${NOCOLOR}" >&2
+        echo -e "${RED}4/4 Error: Invalid ORPort format. Must contain only numbers.${NOCOLOR}" >&2
     fi
 done
 
 # EVM address
 echo -e "${NOCOLOR}"
-echo -e "${CYAN}==================================================${NOCOLOR}"
-echo -e "${CYAN}     Ethereum Wallet Configuration (Optional)     ${NOCOLOR}"
-echo -e "${CYAN}==================================================${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+echo -e "${CYAN}    Ethereum Wallet Configuration (Optional)           ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 while true; do
     echo -e "${NOCOLOR}"
-    echo "Do you want to enter your Ethereum address for contribution rewards before finishing the configuration?"
+    echo -e "${CYAN}Optional: Do you want to enter an Ethereum EVM address for contribution rewards before finishing the configuration?${NOCOLOR}"
     read -p "(yes/no): " HAS_ETH_WALLET
     case "$HAS_ETH_WALLET" in
         [Yy][Ee][Ss])
@@ -166,11 +171,13 @@ fi
 sudo systemctl restart anon.service
 
 # show config
-echo -e "${GREEN}==================================================${NOCOLOR}"
-echo -e "${GREEN}              Configuration Summary               ${NOCOLOR}"
-echo -e "${GREEN}==================================================${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+echo -e "${CYAN}             Configuration Summary                     ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 cat /etc/anon/anonrc
 echo -e "${NOCOLOR}"
 echo -e "${GREEN}==================================================${NOCOLOR}"
+echo -e "${GREEN}               Congratulations!                   ${NOCOLOR}"
 echo -e "${GREEN}   Anon configuration completed successfully.     ${NOCOLOR}"
+echo -e "${BLUE_ANON}            https://docs.anyone.io            ${NOCOLOR}"
 echo -e "${GREEN}==================================================${NOCOLOR}"
