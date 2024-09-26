@@ -97,7 +97,7 @@ read -p "3/4 BandwidthBurst (leave empty to skip): " BANDWIDTH_BURST
 while true; do
     echo -e "${NOCOLOR}"
     echo -e "${CYAN}4/4 Enter ORPort${NOCOLOR}"
-    read -rp "[Default: 9001]: " OR_PORT
+    read -rp "4/4 [Default: 9001]: " OR_PORT
     OR_PORT="${OR_PORT:-9001}"
     if [[ $OR_PORT =~ ^[0-9]+$ ]]; then
         break
