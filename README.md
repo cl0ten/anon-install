@@ -71,7 +71,7 @@ Hint: BandwidthBurst must be at least equal to BandwidthRate
 3/4 BandwidthBurst (leave empty to skip): 100
 
 4/4 Enter ORPort
-[Default: 9001]: 9004
+4/4 [Default: 9001]: 9004
 
 ==================================================
     Ethereum Wallet Configuration (Optional)
