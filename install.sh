@@ -4,7 +4,6 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
-#BLUE='\033[0;34m'
 BLUE_ANON='\033[38;2;2;128;175m'
 NOCOLOR='\033[0m'
 
@@ -17,17 +16,15 @@ if ! command -v sudo &>/dev/null; then
     exit 1
 fi
 
-
 # install anon package
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-echo -e "${CYAN}           Starting ANON Installation                  ${NOCOLOR}"
+echo -e "${CYAN}           Starting ANON Installation             ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
-sudo wget -qO- https://deb.en.anyone.tech/anon.asc | sudo tee /etc/apt/trusted.gpg.d/anon.asc
-sudo echo "deb [signed-by=/etc/apt/trusted.gpg.d/anon.asc] https://deb.en.anyone.tech anon-live-$VERSION_CODENAME main" | sudo tee /etc/apt/sources.list.d/anon.list
+wget -qO- https://deb.en.anyone.tech/anon.asc | sudo tee /etc/apt/trusted.gpg.d/anon.asc
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/anon.asc] https://deb.en.anyone.tech anon-live-$VERSION_CODENAME main" | sudo tee /etc/apt/sources.list.d/anon.list
 sudo apt-get update --yes
 sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes anon
-
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Failed to install the anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.${NOCOLOR}"
@@ -35,10 +32,10 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-echo -e "${GREEN}           ANON Installation Complete                 ${NOCOLOR}"
+echo -e "${GREEN}           ANON Installation Complete             ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
-
+# backup config file
 sudo cp /etc/anon/anonrc /etc/anon/anonrc.bak
 
 # print ascii
@@ -62,9 +59,8 @@ echo -e "${NOCOLOR}"
 
 # start config
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-echo -e "${CYAN}        Start Relay Configuration Wizard               ${NOCOLOR}"
+echo -e "${CYAN}        Start Relay Configuration Wizard          ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-
 
 # nickname
 echo -e "${NOCOLOR}"
@@ -78,7 +74,6 @@ done
 
 # contactinfo
 read -p "1/4 Contact Information (leave empty to skip): " CONTACT_INFO
-
 
 # myfamily
 echo -e "${NOCOLOR}"
@@ -114,12 +109,12 @@ done
 # EVM address
 echo -e "${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-echo -e "${CYAN}    Ethereum Wallet Configuration (Optional)           ${NOCOLOR}"
+echo -e "${CYAN}    Ethereum Wallet Configuration (Optional)      ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 while true; do
     echo -e "${NOCOLOR}"
-    echo -e "${CYAN}Optional: Do you want to enter an Ethereum EVM address for contribution rewards before finishing the configuration?${NOCOLOR}"
+    echo -e "${CYAN}Optional: Do you want to enter an Ethereum EVM address for contribution rewards${NOCOLOR}"
     read -p "(yes/no): " HAS_ETH_WALLET
     case "$HAS_ETH_WALLET" in
         [Yy][Ee][Ss])
@@ -151,7 +146,7 @@ Nickname $NICKNAME
 ContactInfo $CONTACT_INFO
 Log notice file /var/log/anon/notices.log
 ORPort $OR_PORT
-ControlPort 9051
+#ControlPort 9051 # uncomment this line and restart the anon.service to enable the ControlPort
 SocksPort 0
 ExitRelay 0
 IPv6Exit 0
@@ -170,12 +165,12 @@ sudo systemctl restart anon.service
 
 # show config
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-echo -e "${CYAN}             Configuration Summary                     ${NOCOLOR}"
+echo -e "${CYAN}             Configuration Summary                ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 cat /etc/anon/anonrc
 echo -e "${NOCOLOR}"
 echo -e "${GREEN}==================================================${NOCOLOR}"
 echo -e "${GREEN}               Congratulations!                   ${NOCOLOR}"
 echo -e "${GREEN}   Anon configuration completed successfully.     ${NOCOLOR}"
-echo -e "${BLUE_ANON}            https://docs.anyone.io            ${NOCOLOR}"
+echo -e "${BLUE_ANON}              https://docs.anyone.io              ${NOCOLOR}"
 echo -e "${GREEN}==================================================${NOCOLOR}"
