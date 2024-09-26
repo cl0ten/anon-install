@@ -77,7 +77,7 @@ Hint: BandwidthBurst must be at least equal to BandwidthRate
     Ethereum Wallet Configuration (Optional)
 ==================================================
 
-Optional: Do you want to enter an Ethereum EVM address for contribution rewards before finishing the configuration?
+Optional: Do you want to enter an Ethereum EVM address for contribution rewards
 (yes/no): yes
 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 ==================================================
@@ -87,7 +87,7 @@ Nickname nickname
 ContactInfo noname@example.com @anon: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Log notice file /var/log/anon/notices.log
 ORPort 9004
-ControlPort 9051
+#ControlPort 9051 # uncomment this line and restart the anon.service to enable the ControlPort
 SocksPort 0
 ExitRelay 0
 IPv6Exit 0
@@ -100,7 +100,7 @@ MyFamily 6TE606BE5CB537A93E2CD0F2F5AJ0EA4C8B42FDB,0313A82A4CE6F9C4C1451099F91A14
 ==================================================
                Congratulations!
    Anon configuration completed successfully.
-            https://docs.anyone.io
+              https://docs.anyone.io
 ==================================================
 ```
 
