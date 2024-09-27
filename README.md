@@ -8,7 +8,7 @@ To install the Anon Relay, run the following command in your terminal:
 ```bash
 sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-install/refs/heads/main/install.sh)"
 ```
-This will download and execute the latest version of the installation script.
+This will download and execute the latest version of the installation script. 
 
 ## Usage
 The installation script will guide you through a step-by-step configuration process, allowing you to specify:
@@ -18,15 +18,25 @@ The installation script will guide you through a step-by-step configuration proc
     MyFamily fingerprints (optional)
     BandwidthRate and BandwidthBurst (optional)
     ORPort (with a default of 9001)
+    ControlPort (optional, with a default of 9051)
     Ethereum Wallet Address (optional)
+    Firewall Setup (optional)
 
 ## Ethereum Wallet Configuration
 During the process, you will be asked if you want to provide an Ethereum EVM address for receiving contribution rewards. This is optional and can be skipped.
+If you want to read more about the Rewards Program, visit [https://docs.anyone.io](https://docs.anyone.io).
 
 ## Backup and Customization
-The script automatically backs up the original configuration file (/etc/anon/anonrc) before writing new settings. 
+The script automatically backs up the original configuration file to /etc/anon/anonrc.bak before writing new settings.
+If needed, you can manually edit the configuration file after the installation or run the script again to back up the last settings and provide new ones.
 
-If needed, you can manually edit the configuration file after the installation or run the script again to backup the last settings to provide new ones.
+## Firewall Setup
+The script offers an optional installation of the Uncomplicated Firewall (UFW) to secure the OS your Anon relay is running on by allowing traffic only through the specified ORPort and SSH port.
+If you choose to use UFW, the script will:
+
+    Install UFW (if not already installed)
+    Allow traffic on the specified ORPort and SSH port
+    Enable UFW
 
 ## Example
 Here's an example of the output from running the script:
@@ -35,7 +45,7 @@ Here's an example of the output from running the script:
 sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-install/refs/heads/main/install.sh)"
 ```
 ```mathematics
-..
+...
 ==================================================
            ANON Installation Complete
 ==================================================
@@ -56,38 +66,74 @@ sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-in
 
 ==================================================
         Start Relay Configuration Wizard
+  (Or abort and manually edit /etc/anon/anonrc)
 ==================================================
 
-1/4 Enter the desired Nickname and Contact information for your Anon Relay
-1/4 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): nickname
-1/4 Contact Information (leave empty to skip): noname@example.com
+- Enter the desired Nickname and Contact information for your Anon Relay
+1/7 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): nickname
+1/7 Contact Information (leave empty to skip): noname@example.com
 
-2/4 Enter a comma-separated list of fingerprints for your relay's family
-2/4 MyFamily fingerprints (leave empty to skip): 6TE606BE5CB537A93E2CD0F2F5AJ0EA4C8B42FDB,0313A82A4CE6F9C4C1451099F91A1424BAC714M0
+- Enter a comma-separated list of fingerprints for your relay's family
+2/7 MyFamily fingerprints (leave empty to skip): AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-3/4 Enter BandwidthRate and BandwidthBurst in Mbit
-Hint: BandwidthBurst must be at least equal to BandwidthRate
-3/4 BandwidthRate (leave empty to skip): 80
-3/4 BandwidthBurst (leave empty to skip): 100
+- Enter BandwidthRate and BandwidthBurst in Mbit
 
-4/4 Enter ORPort
-4/4 [Default: 9001]: 9004
+Hint: BandwidthBurst must be at least equal to BandwidthRate.
+3/7 BandwidthRate (leave empty to skip): 80
+3/7 BandwidthBurst (leave empty to skip): 100
+
+- Enter ORPort
+4/7 ORPort [Default: 9001]: 9004
+
+- Should the ControlPort be enabled?
+5/7 [Default: yes]: yes
 
 ==================================================
     Ethereum Wallet Configuration (Optional)
 ==================================================
 
-Optional: Do you want to enter an Ethereum EVM address for contribution rewards
-(yes/no): yes
-Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+- Optional: Do you want to enter an Ethereum EVM address for contribution rewards
+6/7 (yes/no): yes
+6/7 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
 ==================================================
-             Configuration Summary
+  Uncomplicated Firewall Installation (Optional)
 ==================================================
+
+- Optional: Would you like to install UFW and allow traffic on ORPort 9004 and SSH port 22?
+7/7 (yes/no): yes
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+ufw is already the newest version (0.36.1-4ubuntu0.1).
+0 upgraded, 0 newly installed, 0 to remove and 1 not upgraded.
+Rule added
+Rule added (v6)
+Skipping adding existing rule
+Skipping adding existing rule (v6)
+Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+Firewall is active and enabled on system startup
+
+==================================================
+UFW installed and rules added for ORPort 9004 and SSH port 22.
+
+Make sure old firewall rules are removed if they are no longer valid.
+To show current UFW configuration: sudo ufw status
+To remove an old rule: sudo ufw delete allow <port-number>
+==================================================
+For improved security, consider setting up SSH key authentication instead of using a password.
+Refer to official documentation: https://www.ssh.com/ssh/keygen for instructions.
+
+==================================================
+               Congratulations!
+   Anon configuration completed successfully.
+==================================================
+
 Nickname nickname
 ContactInfo noname@example.com @anon: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 Log notice file /var/log/anon/notices.log
 ORPort 9004
-#ControlPort 9051 # uncomment this line and restart the anon.service to enable the ControlPort
+ControlPort 9051
 SocksPort 0
 ExitRelay 0
 IPv6Exit 0
@@ -95,13 +141,12 @@ ExitPolicy reject *:*
 ExitPolicy reject6 *:*
 BandwidthRate 80 Mbit
 BandwidthBurst 100 Mbit
-MyFamily 6TE606BE5CB537A93E2CD0F2F5AJ0EA4C8B42FDB,0313A82A4CE6F9C4C1451099F91A1424BAC714M0
+MyFamily AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 ==================================================
-               Congratulations!
-   Anon configuration completed successfully.
               https://docs.anyone.io
 ==================================================
+
 ```
 
 ## Dependencies
