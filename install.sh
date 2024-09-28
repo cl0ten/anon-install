@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# TODO
+#
+# Validation for:
+# ORPort (range of allowed ports)
+# BandwidthRate  (only numbers in Mbit)
+# BandwidthBurst (only numbers in Mbit)
+# MyFamily FF (comma-separated upper case 40 char fingerprints)
+
+#Decide if 5/7 Enable ControlPort? [Default: yes or no (?)
+
 # colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -112,7 +122,7 @@ done
 while true; do
     echo -e "${NOCOLOR}"
     echo -e "${CYAN}- Should the ControlPort be enabled?${NOCOLOR}"
-    read -rp "5/7 [Default: yes]: " ENABLE_CONTROL_PORT   #hmmmmmmmmmmmm, should this be default: yes or no????
+    read -rp "5/7 Enable ControlPort? [Default: yes]: " ENABLE_CONTROL_PORT   #hmmmmmmmmmmmm, should this be default: yes or no????
     ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-yes}"
     if [[ "$ENABLE_CONTROL_PORT" =~ ^[Yy][Ee][Ss]$ ]]; then
         CONTROL_PORT="9051"
