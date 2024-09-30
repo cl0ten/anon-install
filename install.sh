@@ -227,6 +227,7 @@ fi
 
 # show fingerprint
 FINGERPRINT_FILE="/var/lib/anon/fingerprint"
+TIMEOUT=90
 
 function show_fingerprint {
     if [ -f "$FINGERPRINT_FILE" ]; then
@@ -244,10 +245,18 @@ function show_fingerprint {
 sudo systemctl restart anon.service
 
 # check if the fingerprint file is generated
+start_time=$(date +%s)
 if [ ! -f "$FINGERPRINT_FILE" ]; then
     echo -e "${CYAN}Waiting for the fingerprint to be generated...${NOCOLOR}\n"
     while [ ! -f "$FINGERPRINT_FILE" ]; do
         sleep 2
+        current_time=$(date +%s)
+        elapsed_time=$(( current_time - start_time ))
+        if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
+            echo -e "${RED}Error: Timeout waiting for the fingerprint to be generated.${NOCOLOR}"
+            echo "Please check the service or configuration."
+            exit 1
+        fi
     done
 fi
 
