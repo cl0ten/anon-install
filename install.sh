@@ -1,13 +1,6 @@
 #!/bin/bash
 
 # TODO
-#
-# Validation for:
-# ORPort (range of allowed ports)
-# BandwidthRate  (only numbers in Mbit)
-# BandwidthBurst (only numbers in Mbit)
-# MyFamily FF (comma-separated upper case 40 char fingerprints)
-
 #Decide if 5/7 Enable ControlPort? [Default: yes or no (?)
 
 # colors
@@ -34,7 +27,6 @@ echo -e "${BLUE_ANON}==================================================${NOCOLOR
 wget -qO- https://deb.en.anyone.tech/anon.asc | sudo tee /etc/apt/trusted.gpg.d/anon.asc
 echo "deb [signed-by=/etc/apt/trusted.gpg.d/anon.asc] https://deb.en.anyone.tech anon-live-$VERSION_CODENAME main" | sudo tee /etc/apt/sources.list.d/anon.list
 sudo apt-get update --yes
-#sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes anon
 sudo apt-get install anon --yes
 
 if [ $? -ne 0 ]; then
@@ -119,11 +111,7 @@ while true; do
     fi
 done
 
-
-
 # ORport
-
-
 while true; do
     echo -e "${CYAN}\n- Enter ORPort${NOCOLOR}"
     read -rp "4/7 ORPort [Default: 9001]: " OR_PORT
@@ -136,9 +124,6 @@ while true; do
 		echo -e "${RED}Keep in mind that not all ports in this range will work out of the box.${NOCOLOR}"
     fi
 done
-
-
-
 
 # controlPort
 while true; do
@@ -252,7 +237,6 @@ EOF
 if [[ -n "$MY_FAMILY" ]]; then
     echo "MyFamily $MY_FAMILY" | sudo tee -a /etc/anon/anonrc >/dev/null
 fi
-
 
 # show fingerprint
 FINGERPRINT_FILE="/var/lib/anon/fingerprint"
