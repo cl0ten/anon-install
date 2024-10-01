@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# TODO
-#Decide if 5/7 Enable ControlPort? [Default: yes or no (?)
-
 # colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -77,8 +74,6 @@ done
 read -p "1/7 Contact Information (leave empty to skip): " CONTACT_INFO
 
 # myfamily
-
-
 echo -e "${CYAN}\n- Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
 read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-F0-9]{40})(,[A-F0-9]{40})*$ ]]; do
@@ -128,8 +123,8 @@ done
 # controlPort
 while true; do
     echo -e "${CYAN}\n- Should the ControlPort be enabled?${NOCOLOR}"
-    read -rp "5/7 Enable ControlPort? [Default: yes]: " ENABLE_CONTROL_PORT   #hmmmmmmmmmmmm, should this be default: yes or no????
-    ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-yes}"
+    read -rp "5/7 Enable ControlPort? [Default: no]: " ENABLE_CONTROL_PORT   #hmmmmmmmmmmmm, should this be default: yes or no????
+    ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-no}"
     if [[ "$ENABLE_CONTROL_PORT" =~ ^[Yy][Ee][Ss]$ ]]; then
         CONTROL_PORT="9051"
         break
