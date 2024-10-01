@@ -22,7 +22,7 @@ NOCOLOR='\033[0m'
 
 # check sudo
 if ! command -v sudo &>/dev/null; then
-    echo -e "${RED}Error: sudo command not found. Please make sure that you run the installation command with sudo.${NOCOLOR}"
+    echo -e "${RED}\nError: sudo command not found. Please make sure that you run the installation command with sudo.${NOCOLOR}"
     exit 1
 fi
 
@@ -77,8 +77,7 @@ echo -e "${BLUE_ANON}==================================================${NOCOLOR
 echo -e "${CYAN}\n- Enter the desired Nickname and Contact information for your Anon Relay${NOCOLOR}"
 read -p "1/7 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 while ! [[ "$NICKNAME" =~ ^[a-zA-Z0-9]{1,19}$ ]]; do
-    echo -e "${RED}Error: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces.${NOCOLOR}"
-    echo -e "1/7${CYAN}- Enter the desired Nickname and Contact information for your Anon Relay${NOCOLOR}"
+    echo -e "${RED}\nError: Invalid nickname format. Please enter 1-19 characters, only [a-zA-Z0-9] and no spaces.${NOCOLOR}\n"
 	read -p "1/7 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 done
 
@@ -86,31 +85,60 @@ done
 read -p "1/7 Contact Information (leave empty to skip): " CONTACT_INFO
 
 # myfamily
+
+
 echo -e "${CYAN}\n- Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
 read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
-while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-Z0-9]+,)*[A-Z0-9]+$ ]]; do
-    echo -e "${RED}Error: Invalid MyFamily format. Please enter comma-separated fingerprints with only capital letters.${NOCOLOR}"
-    echo -e "${CYAN}- Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
-	read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
+while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-F0-9]{40})(,[A-F0-9]{40})*$ ]]; do
+    echo -e "${RED}\nError: Please enter comma-separated fingerprints, each 40 characters long, with only capital letters A-F and numbers 0-9.${NOCOLOR}\n"
+    read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 done
 
 # bandwidthrate
-echo -e "${CYAN}\n- Enter BandwidthRate and BandwidthBurst in Mbit ${NOCOLOR}"
-#echo -e "Hint: ${BLUE_ANON}BandwidthBurst must be at least equal to BandwidthRate. ${NOCOLOR}"
-read -p "3/7 BandwidthRate (leave empty to skip): " BANDWIDTH_RATE
-read -p "3/7 BandwidthBurst (leave empty to skip): " BANDWIDTH_BURST
+MAX_BANDWIDTH=100000
+
+while true; do
+    echo -e "${CYAN}\n- Enter BandwidthRate and BandwidthBurst in Mbit (e.g., 100 for 100 Mbit)${NOCOLOR}"
+    read -p "3/7 BandwidthRate (leave empty to skip): " BANDWIDTH_RATE
+    read -p "3/7 BandwidthBurst (leave empty to skip): " BANDWIDTH_BURST
+    if [[ -z "$BANDWIDTH_RATE" && -z "$BANDWIDTH_BURST" ]]; then
+        break
+    fi
+    if [[ "$BANDWIDTH_RATE" =~ ^[0-9]+$ ]] && [[ "$BANDWIDTH_BURST" =~ ^[0-9]+$ ]]; then
+        if [ "$BANDWIDTH_RATE" -le "$MAX_BANDWIDTH" ] && [ "$BANDWIDTH_BURST" -le "$MAX_BANDWIDTH" ]; then
+            if [ "$BANDWIDTH_BURST" -ge "$BANDWIDTH_RATE" ]; then
+                break
+            else
+                echo -e "${RED}\nError: BandwidthBurst must be greater than or equal to BandwidthRate.${NOCOLOR}"
+            fi
+        else
+            echo -e "${RED}\nError: Bandwidth values must be between 1 and $MAX_BANDWIDTH Mbit.${NOCOLOR}"
+        fi
+    else
+        echo -e "${RED}\nError: Please enter valid numeric values for both BandwidthRate and BandwidthBurst.${NOCOLOR}"
+    fi
+done
+
+
 
 # ORport
+
+
 while true; do
     echo -e "${CYAN}\n- Enter ORPort${NOCOLOR}"
     read -rp "4/7 ORPort [Default: 9001]: " OR_PORT
     OR_PORT="${OR_PORT:-9001}"
-    if [[ $OR_PORT =~ ^[0-9]+$ ]]; then
+    if [[ "$OR_PORT" =~ ^[0-9]+$ ]] && [ "$OR_PORT" -ge 1 ] && [ "$OR_PORT" -le 65535 ]; then
+        echo -e "${GREEN}ORPort set to: $OR_PORT${NOCOLOR}"
         break
     else
-        echo -e "${RED}Error: Invalid ORPort format. Must contain only numbers.${NOCOLOR}" >&2
+        echo -e "${RED}\nError: Invalid ORPort. It must be a number between 1 and 65535.${NOCOLOR}"
+		echo -e "${RED}Keep in mind that not all ports in this range will work out of the box.${NOCOLOR}"
     fi
 done
+
+
+
 
 # controlPort
 while true; do
@@ -124,7 +152,7 @@ while true; do
         CONTROL_PORT=""
         break
     else
-        echo -e "${RED}Error: Please respond with 'yes' or 'no'.${NOCOLOR}"
+        echo -e "${RED}\nError: Please respond with 'yes' or 'no'.${NOCOLOR}"
     fi
 done
 
@@ -144,7 +172,7 @@ while true; do
                     CONTACT_INFO="$CONTACT_INFO @anon: $ETH_WALLET"
                     break
                 else
-                    echo -e "${RED}Error: Invalid Ethereum wallet address format. Must start with '0x' followed by 40 hexadecimal characters.${NOCOLOR}"
+                    echo -e "${RED}\nError: Invalid Ethereum wallet address format. Must start with '0x' followed by 40 hexadecimal characters.${NOCOLOR}"
                 fi
             done
             break
@@ -153,7 +181,7 @@ while true; do
             break
             ;;
         *)
-            echo -e "${RED}Error: Please respond with 'yes' or 'no'.${NOCOLOR}"
+            echo -e "${RED}\nError: Please respond with 'yes' or 'no'.${NOCOLOR}"
             ;;
     esac
 done
@@ -194,7 +222,7 @@ while true; do
             break
             ;;
         *)
-            echo -e "${RED}Error: Please respond with 'yes' or 'no'.${NOCOLOR}"
+            echo -e "${RED}\nError: Please respond with 'yes' or 'no'.${NOCOLOR}"
             ;;
     esac
 done
@@ -225,6 +253,7 @@ if [[ -n "$MY_FAMILY" ]]; then
     echo "MyFamily $MY_FAMILY" | sudo tee -a /etc/anon/anonrc >/dev/null
 fi
 
+
 # show fingerprint
 FINGERPRINT_FILE="/var/lib/anon/fingerprint"
 TIMEOUT=90
@@ -236,7 +265,7 @@ function show_fingerprint {
         cat "$FINGERPRINT_FILE"
         echo -e "${BLUE_ANON}==================================================${NOCOLOR}\n"
     else
-        echo -e "${RED}Error: Fingerprint file not found at $FINGERPRINT_FILE.${NOCOLOR}"
+        echo -e "${RED}\nError: Fingerprint file not found at $FINGERPRINT_FILE.${NOCOLOR}"
         echo "Please make sure the service is properly configured and running."
     fi
 }
@@ -253,7 +282,7 @@ if [ ! -f "$FINGERPRINT_FILE" ]; then
         current_time=$(date +%s)
         elapsed_time=$(( current_time - start_time ))
         if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
-            echo -e "${RED}Error: Timeout waiting for the fingerprint to be generated.${NOCOLOR}"
+            echo -e "${RED}\nError: Timeout waiting for the fingerprint to be generated.${NOCOLOR}"
             echo "Please check the service or configuration."
             exit 1
         fi
