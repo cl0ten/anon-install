@@ -1,22 +1,18 @@
 #!/bin/bash
 
-# colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 BLUE_ANON='\033[38;2;2;128;175m'
 NOCOLOR='\033[0m'
 
-# load release info
 . /etc/os-release
 
-# check sudo
 if ! command -v sudo &>/dev/null; then
     echo -e "${RED}\nError: sudo command not found. Please make sure that you run the installation command with sudo.${NOCOLOR}"
     exit 1
 fi
 
-# install anon package
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 echo -e "${GREEN}           Starting ANON Installation             ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
@@ -27,7 +23,7 @@ sudo apt-get update --yes
 sudo apt-get install anon --yes
 
 if [ $? -ne 0 ]; then
-    echo -e "${RED}\nFailed to install the Anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.${NOCOLOR}\n"
+    echo -e "${RED}\nFailed to install the Anon package. Quitting installation. Ensure $PRETTY_NAME $VERSION_CODENAME is supported.\n${NOCOLOR}"
     exit 1
 fi
 
@@ -35,10 +31,8 @@ echo -e "${BLUE_ANON}==================================================${NOCOLOR
 echo -e "${GREEN}           ANON Installation Complete             ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
-# backup config file
 sudo cp /etc/anon/anonrc /etc/anon/anonrc.bak
 
-# print ascii
 echo -e "${BLUE_ANON}"
 cat << "EOF"
 
@@ -56,13 +50,11 @@ cat << "EOF"
 
 EOF
 
-# start config
 echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
 echo -e "${GREEN}        Start Relay Configuration Wizard          ${NOCOLOR}"
 echo -e "${CYAN}  (Or abort and manually edit /etc/anon/anonrc)   ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
-# nickname
 echo -e "${CYAN}\n- Enter the desired Nickname and Contact information for your Anon Relay${NOCOLOR}"
 read -p "1/7 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 while ! [[ "$NICKNAME" =~ ^[a-zA-Z0-9]{1,19}$ ]]; do
@@ -70,10 +62,8 @@ while ! [[ "$NICKNAME" =~ ^[a-zA-Z0-9]{1,19}$ ]]; do
 	read -p "1/7 Nickname (1-19 characters, only [a-zA-Z0-9] and no spaces): " NICKNAME
 done
 
-# contactinfo
 read -p "1/7 Contact Information (leave empty to skip): " CONTACT_INFO
 
-# myfamily
 echo -e "${CYAN}\n- Enter a comma-separated list of fingerprints for your relay's family${NOCOLOR}"
 read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-F0-9]{40})(,[A-F0-9]{40})*$ ]]; do
@@ -81,7 +71,6 @@ while [[ -n "$MY_FAMILY" && ! "$MY_FAMILY" =~ ^([A-F0-9]{40})(,[A-F0-9]{40})*$ ]
     read -p "2/7 MyFamily fingerprints (leave empty to skip): " MY_FAMILY
 done
 
-# bandwidthrate
 MAX_BANDWIDTH=100000
 
 while true; do
@@ -106,7 +95,6 @@ while true; do
     fi
 done
 
-# ORport
 while true; do
     echo -e "${CYAN}\n- Enter ORPort${NOCOLOR}"
     read -rp "4/7 ORPort [Default: 9001]: " OR_PORT
@@ -120,10 +108,9 @@ while true; do
     fi
 done
 
-# controlPort
 while true; do
     echo -e "${CYAN}\n- Should the ControlPort be enabled?${NOCOLOR}"
-    read -rp "5/7 Enable ControlPort? [Default: no]: " ENABLE_CONTROL_PORT   #hmmmmmmmmmmmm, should this be default: yes or no????
+    read -rp "5/7 Enable ControlPort? [Default: no]: " ENABLE_CONTROL_PORT
     ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-no}"
     if [[ "$ENABLE_CONTROL_PORT" =~ ^[Yy][Ee][Ss]$ ]]; then
         CONTROL_PORT="9051"
@@ -136,7 +123,6 @@ while true; do
     fi
 done
 
-# EVM address
 echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
 echo -e "${CYAN}    Ethereum Wallet Configuration (Optional)      ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
@@ -170,13 +156,11 @@ echo -e "${BLUE_ANON}\n==================================================${NOCOL
 echo -e "${CYAN}  Uncomplicated Firewall Installation (Optional)  ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
-# SSH port check
 SSH_PORT=$(grep -E '^[^#]*Port ' /etc/ssh/sshd_config | awk '{print $2}' | head -n 1)
 if [ -z "$SSH_PORT" ]; then
     SSH_PORT=22
 fi
 
-# ufw installation
 while true; do
     echo -e "${CYAN}\n- Would you like to install UFW and allow traffic on ORPort ${NOCOLOR}$OR_PORT ${CYAN}and SSH port ${NOCOLOR}$SSH_PORT${CYAN}?${NOCOLOR}"
     read -rp "7/7 (yes/no): " INSTALL_UFW
@@ -192,13 +176,11 @@ while true; do
 			echo -e "${CYAN}\nMake sure old firewall rules are removed if they are no longer valid.${NOCOLOR}"
 			echo -e "${CYAN}To show current UFW configuration:${NOCOLOR} ${GREEN}sudo ufw status${NOCOLOR}"
 			echo -e "${CYAN}To remove an old rule:${NOCOLOR} ${GREEN}sudo ufw delete allow <port-number>${NOCOLOR}"
-			#echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
             break
             ;;
         [Nn][Oo])
 			echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
             echo -e "${GREEN}Skipping UFW installation.${NOCOLOR}"
-			#echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
             break
             ;;
         *)
@@ -207,11 +189,9 @@ while true; do
     esac
 done
 
-# SSH keys setup reminder
 echo -e "${CYAN}\nFor improved security, consider setting up SSH key authentication.${NOCOLOR}"
 echo -e "${CYAN}Refer to official documentation: https://www.ssh.com/ssh/keygen for instructions.${NOCOLOR}\n"
 
-# write config to anonrc
 sudo rm -f /etc/anon/anonrc
 
 cat <<EOF | sudo tee /etc/anon/anonrc >/dev/null
@@ -233,7 +213,6 @@ if [[ -n "$MY_FAMILY" ]]; then
     echo "MyFamily $MY_FAMILY" | sudo tee -a /etc/anon/anonrc >/dev/null
 fi
 
-# show fingerprint
 FINGERPRINT_FILE="/var/lib/anon/fingerprint"
 TIMEOUT=90
 
@@ -249,10 +228,8 @@ function show_fingerprint {
     fi
 }
 
-# restart service
 sudo systemctl restart anon.service
 
-# check if the fingerprint file is generated
 start_time=$(date +%s)
 if [ ! -f "$FINGERPRINT_FILE" ]; then
     echo -e "${CYAN}Waiting for the fingerprint to be generated...${NOCOLOR}\n"
@@ -268,10 +245,8 @@ if [ ! -f "$FINGERPRINT_FILE" ]; then
     done
 fi
 
-# display the fingerprint
 show_fingerprint
 
-# show config
 cat /etc/anon/anonrc
 
 echo -e "${GREEN}\n==================================================${NOCOLOR}"
