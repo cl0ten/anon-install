@@ -46,6 +46,7 @@ sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-in
 ```
 ```mathematics
 ...
+
 ==================================================
            ANON Installation Complete
 ==================================================
@@ -76,23 +77,22 @@ sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-in
 - Enter a comma-separated list of fingerprints for your relay's family
 2/7 MyFamily fingerprints (leave empty to skip): AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
-- Enter BandwidthRate and BandwidthBurst in Mbit
-
-Hint: BandwidthBurst must be at least equal to BandwidthRate.
-3/7 BandwidthRate (leave empty to skip): 80
-3/7 BandwidthBurst (leave empty to skip): 100
+- Enter BandwidthRate and BandwidthBurst in Mbit (e.g., 100 for 100 Mbit)
+3/7 BandwidthRate (leave empty to skip): 100
+3/7 BandwidthBurst (leave empty to skip): 120
 
 - Enter ORPort
 4/7 ORPort [Default: 9001]: 9004
+ORPort set to: 9004
 
 - Should the ControlPort be enabled?
-5/7 [Default: yes]: yes
+5/7 Enable ControlPort? [Default: yes]: yes
 
 ==================================================
     Ethereum Wallet Configuration (Optional)
 ==================================================
 
-- Optional: Do you want to enter an Ethereum EVM address for contribution rewards
+- Do you want to enter an Ethereum EVM address for contribution rewards
 6/7 (yes/no): yes
 6/7 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
@@ -100,17 +100,16 @@ Hint: BandwidthBurst must be at least equal to BandwidthRate.
   Uncomplicated Firewall Installation (Optional)
 ==================================================
 
-- Optional: Would you like to install UFW and allow traffic on ORPort 9004 and SSH port 22?
+- Would you like to install UFW and allow traffic on ORPort 9004 and SSH port 22?
 7/7 (yes/no): yes
 Reading package lists... Done
 Building dependency tree... Done
-Reading state information... Done
-ufw is already the newest version (0.36.1-4ubuntu0.1).
-0 upgraded, 0 newly installed, 0 to remove and 1 not upgraded.
-Rule added
-Rule added (v6)
-Skipping adding existing rule
-Skipping adding existing rule (v6)
+...
+
+Rules updated
+Rules updated (v6)
+Rules updated
+Rules updated (v6)
 Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
 Firewall is active and enabled on system startup
 
@@ -120,13 +119,15 @@ UFW installed and rules added for ORPort 9004 and SSH port 22.
 Make sure old firewall rules are removed if they are no longer valid.
 To show current UFW configuration: sudo ufw status
 To remove an old rule: sudo ufw delete allow <port-number>
-==================================================
-For improved security, consider setting up SSH key authentication instead of using a password.
+
+For improved security, consider setting up SSH key authentication.
 Refer to official documentation: https://www.ssh.com/ssh/keygen for instructions.
 
+Waiting for the fingerprint to be generated...
+
 ==================================================
-               Congratulations!
-   Anon configuration completed successfully.
+            Anon Relay Fingerprint:
+nickname 642DE99859D4DE59B23452D693DDB2B2F83AF112
 ==================================================
 
 Nickname nickname
@@ -139,13 +140,16 @@ ExitRelay 0
 IPv6Exit 0
 ExitPolicy reject *:*
 ExitPolicy reject6 *:*
-BandwidthRate 80 Mbit
-BandwidthBurst 100 Mbit
+BandwidthRate 100 Mbit
+BandwidthBurst 120 Mbit
 MyFamily AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB,CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 
 ==================================================
-              https://docs.anyone.io
+               Congratulations!
+   Anon configuration completed successfully.
+            https://docs.anyone.io
 ==================================================
+
 
 ```
 
