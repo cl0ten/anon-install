@@ -86,7 +86,7 @@ sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-in
 ORPort set to: 9004
 
 - Should the ControlPort be enabled?
-5/7 Enable ControlPort? [Default: yes]: yes
+5/7 Enable ControlPort? [Default: no]: yes
 
 ==================================================
     Ethereum Wallet Configuration (Optional)
