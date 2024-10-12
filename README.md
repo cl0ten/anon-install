@@ -127,7 +127,7 @@ https://help.ubuntu.com/community/UFW
 
 - Would you like to install UncomplicatedFirewall and allow incoming traffic on:
 - ORPort 9004
-- SSH port 22?
+- SSH port 22
 
 7/7 Configure and enable ufw (yes/no): yes
 Reading package lists... Done
