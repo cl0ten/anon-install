@@ -170,7 +170,7 @@ if [ -z "$SSH_PORT" ]; then
 fi
 
 while true; do
-    echo -e "${CYAN}\n- Would you like to install UncomplicatedFirewall and allow incoming traffic on: \n- ORPort ${NOCOLOR}$OR_PORT ${CYAN} \n- SSH port ${NOCOLOR}$SSH_PORT${CYAN}?\n${NOCOLOR}"
+    echo -e "${CYAN}\n- Would you like to install UncomplicatedFirewall and allow incoming traffic on: \n- ORPort ${NOCOLOR}$OR_PORT ${CYAN} \n- SSH port ${NOCOLOR}$SSH_PORT${CYAN}\n${NOCOLOR}"
     read -rp "7/7 Configure and enable ufw (yes/no): " INSTALL_UFW
     case "$INSTALL_UFW" in
         [Yy][Ee][Ss])
