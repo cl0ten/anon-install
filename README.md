@@ -18,8 +18,8 @@ The installation script will guide you through a step-by-step configuration proc
     MyFamily fingerprints (optional)
     BandwidthRate and BandwidthBurst (optional)
     ORPort (with a default of 9001)
-    ControlPort (optional, with a default of 9051)
     Ethereum Wallet Address (optional)
+    ControlPort (optional, with a default of 9051)
     Firewall Setup (optional)
 
 ## Ethereum Wallet Configuration
@@ -31,7 +31,7 @@ The script automatically backs up the original configuration file to /etc/anon/a
 If needed, you can manually edit the configuration file after the installation or run the script again to back up the last settings and provide new ones.
 
 ## Firewall Setup
-The script offers an optional installation of the Uncomplicated Firewall (UFW) to secure the OS your Anon relay is running on by allowing traffic only through the specified ORPort and SSH port.
+The script offers an optional installation of the UncomplicatedFirewall (UFW) to secure the OS your Anon relay is running on by allowing traffic only through the specified ORPort and SSH port.
 If you choose to use UFW, the script will:
 
     Install UFW (if not already installed)
@@ -45,6 +45,14 @@ Here's an example of the output from running the script:
 sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-install/refs/heads/main/install.sh)"
 ```
 ```mathematics
+...
+Configuring anon
+----------------
+
+Please read the terms and conditions at https://www.anyone.io/terms
+
+Do you accept the terms and conditions? [yes/no] yes
+
 ...
 
 ==================================================
@@ -85,25 +93,48 @@ sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/cl0ten/anon-in
 4/7 ORPort [Default: 9001]: 9004
 ORPort set to: 9004
 
-- Should the ControlPort be enabled?
-5/7 Enable ControlPort? [Default: no]: yes
-
 ==================================================
-    Ethereum Wallet Configuration (Optional)
+         Ethereum Wallet Configuration
 ==================================================
 
-- Do you want to enter an Ethereum EVM address for contribution rewards
-6/7 (yes/no): yes
-6/7 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+- Do you want to enter an Ethereum EVM address for contribution rewards?
+5/7 Ethereum Address (yes/no): 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+Error: Please respond with 'yes' or 'no'.
+
+- Do you want to enter an Ethereum EVM address for contribution rewards?
+5/7 Ethereum Address (yes/no): yes
+5/7 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
 ==================================================
-  Uncomplicated Firewall Installation (Optional)
+       Enable Monitoring and Control port
 ==================================================
 
-- Would you like to install UFW and allow traffic on ORPort 9004 and SSH port 22?
-7/7 (yes/no): yes
+- Should the anon.service ControlPort be enabled?
+6/7 Enable ControlPort? [Default: no]: yes
+
+==================================================
+      Optional Local Firewall Installation
+==================================================
+
+The default firewall configuration tool for Ubuntu is ufw.
+Developed to ease iptables firewall configuration, ufw provides
+a user friendly way to create an IPv4 or IPv6 host-based firewall.
+By default UFW is disabled.
+
+https://help.ubuntu.com/community/UFW
+
+
+- Would you like to install UncomplicatedFirewall and allow incoming traffic on:
+- ORPort 9004
+- SSH port 22?
+
+7/7 Configure and enable ufw (yes/no): yes
 Reading package lists... Done
 Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  ufw
 ...
 
 Rules updated
@@ -121,13 +152,14 @@ To show current UFW configuration: sudo ufw status
 To remove an old rule: sudo ufw delete allow <port-number>
 
 For improved security, consider setting up SSH key authentication.
-Refer to official documentation: https://www.ssh.com/ssh/keygen for instructions.
+Refer to official documentation: https://ssh.com/ssh/keygen for instructions.
 
-Waiting for the fingerprint to be generated...
+Waiting for the fingerprint to be generated.
+Please don't interrupt the process...
 
 ==================================================
-            Anon Relay Fingerprint:
-nickname 642DE99859D4DE59B23452D693DDB2B2F83AF112
+              Anon Relay Fingerprint
+     058B704D9EF0714C48125B733562657F3F471C08
 ==================================================
 
 Nickname nickname
@@ -149,15 +181,10 @@ MyFamily AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
    Anon configuration completed successfully.
             https://docs.anyone.io
 ==================================================
-
-
 ```
 
 ## Dependencies
-* curl
-* sudo
 * wget
-* apt-get
 
 ## Contributing
 Contributions to this script are welcome! If you'd like to contribute, please fork the repository, make your changes, and submit a pull request.
