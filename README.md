@@ -98,11 +98,6 @@ ORPort set to: 9004
 ==================================================
 
 - Do you want to enter an Ethereum EVM address for contribution rewards?
-5/7 Ethereum Address (yes/no): 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-
-Error: Please respond with 'yes' or 'no'.
-
-- Do you want to enter an Ethereum EVM address for contribution rewards?
 5/7 Ethereum Address (yes/no): yes
 5/7 Enter your Ethereum wallet address: 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
