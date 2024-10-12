@@ -108,32 +108,17 @@ while true; do
     fi
 done
 
-while true; do
-    echo -e "${CYAN}\n- Should the ControlPort be enabled?${NOCOLOR}"
-    read -rp "5/7 Enable ControlPort? [Default: no]: " ENABLE_CONTROL_PORT
-    ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-no}"
-    if [[ "$ENABLE_CONTROL_PORT" =~ ^[Yy][Ee][Ss]$ ]]; then
-        CONTROL_PORT="9051"
-        break
-    elif [[ "$ENABLE_CONTROL_PORT" =~ ^[Nn][Oo]$ ]]; then
-        CONTROL_PORT=""
-        break
-    else
-        echo -e "${RED}\nError: Please respond with 'yes' or 'no'.${NOCOLOR}"
-    fi
-done
-
 echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
-echo -e "${CYAN}    Ethereum Wallet Configuration (Optional)      ${NOCOLOR}"
+echo -e "${CYAN}         Ethereum Wallet Configuration                 ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
 
 while true; do
-    echo -e "${CYAN}\n- Do you want to enter an Ethereum EVM address for contribution rewards${NOCOLOR}"
-    read -p "6/7 (yes/no): " HAS_ETH_WALLET
+    echo -e "${CYAN}\n- Do you want to enter an Ethereum EVM address for contribution rewards?${NOCOLOR}"
+    read -p "5/7 Ethereum Address (yes/no): " HAS_ETH_WALLET
     case "$HAS_ETH_WALLET" in
         [Yy][Ee][Ss])
             while true; do
-                read -p "6/7 Enter your Ethereum wallet address: " ETH_WALLET
+                read -p "5/7 Enter your Ethereum wallet address: " ETH_WALLET
                 if [[ "$ETH_WALLET" =~ ^0x[a-fA-F0-9]{40}$ ]]; then
                     CONTACT_INFO="$CONTACT_INFO @anon: $ETH_WALLET"
                     break
@@ -153,8 +138,31 @@ while true; do
 done
 
 echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
-echo -e "${CYAN}  Uncomplicated Firewall Installation (Optional)  ${NOCOLOR}"
+echo -e "${CYAN}       Enable Monitoring and Control port         ${NOCOLOR}"
 echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+
+while true; do
+    echo -e "${CYAN}\n- Should the anon.service ControlPort be enabled?${NOCOLOR}"
+    read -rp "6/7 Enable ControlPort? [Default: no]: " ENABLE_CONTROL_PORT
+    ENABLE_CONTROL_PORT="${ENABLE_CONTROL_PORT:-no}"
+    if [[ "$ENABLE_CONTROL_PORT" =~ ^[Yy][Ee][Ss]$ ]]; then
+        CONTROL_PORT="9051"
+        break
+    elif [[ "$ENABLE_CONTROL_PORT" =~ ^[Nn][Oo]$ ]]; then
+        CONTROL_PORT=""
+        break
+    else
+        echo -e "${RED}\nError: Please respond with 'yes' or 'no'.${NOCOLOR}"
+    fi
+done
+
+
+echo -e "${BLUE_ANON}\n==================================================${NOCOLOR}"
+echo -e "${CYAN}      Optional Local Firewall Installation        ${NOCOLOR}"
+echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
+
+echo -e "${CYAN}\nThe default firewall configuration tool for Ubuntu is ufw. \nDeveloped to ease iptables firewall configuration, ufw provides\na user friendly way to create an IPv4 or IPv6 host-based firewall. \nBy default UFW is disabled. \n"
+echo -e "${CYAN}https://help.ubuntu.com/community/UFW\n"
 
 SSH_PORT=$(grep -E '^[^#]*Port ' /etc/ssh/sshd_config | awk '{print $2}' | head -n 1)
 if [ -z "$SSH_PORT" ]; then
@@ -162,8 +170,8 @@ if [ -z "$SSH_PORT" ]; then
 fi
 
 while true; do
-    echo -e "${CYAN}\n- Would you like to install UFW and allow traffic on ORPort ${NOCOLOR}$OR_PORT ${CYAN}and SSH port ${NOCOLOR}$SSH_PORT${CYAN}?${NOCOLOR}"
-    read -rp "7/7 (yes/no): " INSTALL_UFW
+    echo -e "${CYAN}\n- Would you like to install UncomplicatedFirewall and allow incoming traffic on: \n- ORPort ${NOCOLOR}$OR_PORT ${CYAN} \n- SSH port ${NOCOLOR}$SSH_PORT${CYAN}?\n${NOCOLOR}"
+    read -rp "7/7 Configure and enable ufw (yes/no): " INSTALL_UFW
     case "$INSTALL_UFW" in
         [Yy][Ee][Ss])
             sudo apt-get install ufw --yes
@@ -190,7 +198,7 @@ while true; do
 done
 
 echo -e "${CYAN}\nFor improved security, consider setting up SSH key authentication.${NOCOLOR}"
-echo -e "${CYAN}Refer to official documentation: https://www.ssh.com/ssh/keygen for instructions.${NOCOLOR}\n"
+echo -e "${CYAN}Refer to official documentation: https://ssh.com/ssh/keygen for instructions.${NOCOLOR}\n"
 
 sudo rm -f /etc/anon/anonrc
 
@@ -214,13 +222,14 @@ if [[ -n "$MY_FAMILY" ]]; then
 fi
 
 FINGERPRINT_FILE="/var/lib/anon/fingerprint"
-TIMEOUT=90
 
 function show_fingerprint {
-    if [ -f "$FINGERPRINT_FILE" ]; then
+    if sudo test -f "$FINGERPRINT_FILE"; then
+        fingerprint=$(sudo awk '{print $2}' "$FINGERPRINT_FILE")
+        
         echo -e "${BLUE_ANON}==================================================${NOCOLOR}"
-        echo -e "${GREEN}            Anon Relay Fingerprint:                ${NOCOLOR}"
-        cat "$FINGERPRINT_FILE"
+        echo -e "${GREEN}              Anon Relay Fingerprint                ${NOCOLOR}"
+        echo -e "${GREEN}     ${NOCOLOR}$fingerprint"
         echo -e "${BLUE_ANON}==================================================${NOCOLOR}\n"
     else
         echo -e "${RED}\nError: Fingerprint file not found at $FINGERPRINT_FILE.${NOCOLOR}"
@@ -231,13 +240,16 @@ function show_fingerprint {
 sudo systemctl restart anon.service
 
 start_time=$(date +%s)
-if [ ! -f "$FINGERPRINT_FILE" ]; then
-    echo -e "${CYAN}Waiting for the fingerprint to be generated...${NOCOLOR}\n"
-    while [ ! -f "$FINGERPRINT_FILE" ]; do
+if ! sudo test -f "$FINGERPRINT_FILE"; then
+    echo -e "${CYAN}Waiting for the fingerprint to be generated.${NOCOLOR}"
+    echo -e "${CYAN}Please don't interrupt the process...${NOCOLOR}\n"
+    
+    while ! sudo test -f "$FINGERPRINT_FILE"; do
         sleep 2
         current_time=$(date +%s)
         elapsed_time=$(( current_time - start_time ))
-        if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
+        
+        if [ "$elapsed_time" -ge "35" ]; then
             echo -e "${RED}\nError: Timeout waiting for the fingerprint to be generated.${NOCOLOR}"
             echo "Please check the service or configuration."
             exit 1
@@ -246,6 +258,8 @@ if [ ! -f "$FINGERPRINT_FILE" ]; then
 fi
 
 show_fingerprint
+
+
 
 cat /etc/anon/anonrc
 
